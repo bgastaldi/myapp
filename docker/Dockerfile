@@ -3,7 +3,7 @@ FROM php:8.0.10-fpm-alpine3.14
 WORKDIR /var/www
 
 RUN rm -rf /var/www/html
-COPY ./html /var/www
+COPY ../html /var/www
 
 RUN apk add --no-cache zip libzip-dev
 RUN docker-php-ext-configure zip && \
