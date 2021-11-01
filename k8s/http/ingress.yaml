@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-host
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/upstream-hash-by: $remote_addr
+
+spec:
+  rules:
+    - host: "myapp.bgastaldi.com"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/wppc"
+            backend:
+              service:
+                name: wppconnect
+                port:
+                  number: 80
+
+          - pathType: Prefix
+            path: "/myapp"
+            backend:
+              service:
+                name: php-app
+                port:
+                  number: 80
