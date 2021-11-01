@@ -1,0 +1,41 @@
+<?php return array(
+    'root' => array(
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'type' => 'library',
+        'install_path' => __DIR__ . '/../../',
+        'aliases' => array(),
+        'reference' => 'e905788e0c8677f189f79a9e3370f692b996da0c',
+        'name' => '__root__',
+        'dev' => true,
+    ),
+    'versions' => array(
+        '__root__' => array(
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../../',
+            'aliases' => array(),
+            'reference' => 'e905788e0c8677f189f79a9e3370f692b996da0c',
+            'dev_requirement' => false,
+        ),
+        'squizlabs/php_codesniffer' => array(
+            'pretty_version' => '3.6.0',
+            'version' => '3.6.0.0',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../squizlabs/php_codesniffer',
+            'aliases' => array(),
+            'reference' => 'ffced0d2c8fa8e6cdc4d695a743271fab6c38625',
+            'dev_requirement' => false,
+        ),
+        'wppconnect-team/wppconnect-php-client' => array(
+            'pretty_version' => 'v2.0.2',
+            'version' => '2.0.2.0',
+            'type' => 'libr',
+            'install_path' => __DIR__ . '/../wppconnect-team/wppconnect-php-client',
+            'aliases' => array(),
+            'reference' => '265ba7ba26fedc8616d8433c2ffbd5f166880964',
+            'dev_requirement' => false,
+        ),
+    ),
+);
