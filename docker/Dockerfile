@@ -13,16 +13,16 @@ RUN apk add --no-cache nginx supervisor && \
 RUN if [[ -d /etc/nginx/http.d ]]; then ln -s /etc/nginx/http.d /etc/nginx/conf.d; fi
 
 # Copy Nginx configuration
-COPY ./config/nginx-http.conf          /etc/nginx/conf.d/0-http.conf
-COPY ./config/nginx-default.conf       /etc/nginx/conf.d/default.conf
+COPY ./docker/config/nginx-http.conf          /etc/nginx/conf.d/0-http.conf
+COPY ./docker/config/nginx-default.conf       /etc/nginx/conf.d/default.conf
 
 # Copy PHP-FPM configuration
-COPY ./config/php-fpm.conf             /usr/local/etc/php-fpm.d/zz-docker_nginx.conf
+COPY ./docker/config/php-fpm.conf             /usr/local/etc/php-fpm.d/zz-docker_nginx.conf
 
 # Copy Supervisor configuration
-COPY ./config/supervisord.conf         /etc/supervisor.d/supervisord.ini
-COPY ./config/supervisord-php-fpm.conf /etc/supervisor.d/php-fpm.ini
-COPY ./config/supervisord-nginx.conf   /etc/supervisor.d/nginx.ini
+COPY ./docker/config/supervisord.conf         /etc/supervisor.d/supervisord.ini
+COPY ./docker/config/supervisord-php-fpm.conf /etc/supervisor.d/php-fpm.ini
+COPY ./docker/config/supervisord-nginx.conf   /etc/supervisor.d/nginx.ini
 
 
 # Set working directory to where the application lives
