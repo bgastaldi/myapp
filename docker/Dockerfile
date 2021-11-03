@@ -29,7 +29,7 @@ COPY ./config/supervisord-nginx.conf   /etc/supervisor.d/nginx.ini
 WORKDIR /var/www
 
 RUN rm -rf /var/www/html
-COPY ./../app /var/www
+COPY ../app /var/www
 
 # Install all extension that application depends
 RUN apk add --no-cache zip libzip-dev
