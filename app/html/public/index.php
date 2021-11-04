@@ -16,7 +16,7 @@ if($_GET):
     ]);
     $util = new Util();
 
-    if($_GET['generate-token']):
+    if(isset($_GET['generate-token'])):
         # Function: Generated Token
         # /api/:session/generate-token
         $response = $wppconnect->generateToken();
@@ -30,7 +30,7 @@ if($_GET):
     endif;
     
 
-    if($_GET['start-session']):
+    if(isset($_GET['start-session'])):
         # Function: Start Session
         # /api/:session/start-session
         $response = $wppconnect->startSession([
@@ -43,7 +43,7 @@ if($_GET):
         $util->debug($response);
     endif;
 
-    if($_GET['send-message']):
+    if(isset($_GET['send-message'])):
         # Function: Send Message
         # /api/:session/send-message
         $response = $wppconnect->sendMessage([
