@@ -3,3 +3,4 @@ package-lock.json
 package.json
 docker-compose.yaml
 nginx
+k8s
