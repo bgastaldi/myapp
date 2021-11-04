@@ -29,7 +29,7 @@ $util->debug($response);
 # Function: Start Session
 # /api/:session/start-session
 $response = $wppconnect->startSession([
-    'webhook' => 'http://wppconnect-nginx:8080/webhook/index.php',
+    'webhook' => 'https://app.eot.ai/api/webhook/index.php',
     'waitQrCode' => true
 ]);
 $response = $util->toArray($response);
