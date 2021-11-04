@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  replicas: 1
+  serviceName: mysql
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:5.7
+          args:
+            [
+              "--innodb-flush-method=O_DSYNC",
+              "--innodb-use-native-aio=0",
+              "--explicit_defaults_for_timestamp=1",
+              "--ignore-db-dir=lost+found",
+            ]
+          env:
+            # Use secret in real usage
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+            - name: MYSQL_DATABASE
+              value: wpp_db
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-volume
+            - mountPath: /docker-entrypoint-initdb.d/
+              name: mysql-initdb
+          resources:
+            requests:
+              cpu: "0.05"
+              memory: "200Mi"
+            limits:
+              cpu: "0.05"
+              memory: "250Mi"
+      volumes:
+        - name: mysql-initdb
+          configMap:
+            name: mysql-initdb-config
+
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-volume
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+data:
+  initdb.sql: |
+    USE wpp_db;
+    CREATE TABLE `wpp_db`.`chat` (
+      `id` INT NOT NULL AUTO_INCREMENT,
+      `session` VARCHAR(255) NOT NULL,
+      `from_number` VARCHAR(45) NULL,
+      `to_number` VARCHAR(45) NULL,
+      `content` LONGTEXT NULL,
+      `type` VARCHAR(45) NOT NULL,
+      `file_name` VARCHAR(255) NULL,
+      `create_at` DATETIME NOT NULL,
+      PRIMARY KEY (`id`))
+    ENGINE = InnoDB
+    DEFAULT CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_unicode_ci;
+---
+#MySQL: Criação do Banco
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+  clusterIP: None

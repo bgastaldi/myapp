@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+        - name: myapp
+          image: bgastaldi/myapp:latest
+          ports:
+            - containerPort: 80
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "0.05"
+              memory: "200Mi"
+            limits:
+              cpu: "0.05"
+              memory: "250Mi"
+---
+#MyApp PHP: Criação do Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp
+spec:
+  selector:
+    app: myapp
+  type: ClusterIP
+  ports:
+    - name: myapp
+      port: 80
+      targetPort: 80
