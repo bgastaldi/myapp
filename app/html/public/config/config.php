@@ -30,7 +30,7 @@ return
             'config' => [
                 'mysql' => [
                     'driver' => 'mysql',
-                    'host' => 'wppconnect-mysql',
+                    'host' => 'mysql-0.mysql',
                     'dbname' => 'wpp_db',
                     'username' => 'root',
                     'password' => 'root',

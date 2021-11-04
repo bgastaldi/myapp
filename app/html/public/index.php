@@ -8,7 +8,7 @@ use WPPConnect\Http\Request;
 use WPPConnect\Helpers\Util;
 
 $wppconnect = new Request([
-    'base_url' => 'http://wppconnect-nginx:8081',
+    'base_url' => 'https://app.eot.ai',
     'secret_key' => 'My53cr3tKY',
     'session' => 'mySessionPHP',
     'token' => null
