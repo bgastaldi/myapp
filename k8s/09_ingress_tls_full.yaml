@@ -17,19 +17,19 @@ spec:
     - host: "app.eot.ai"
       http:
         paths:
+          - path: "/"
+            pathType: Prefix
+            backend:
+              service:
+                name: myapp
+                port:
+                  number: 80
+
           - path: "/api"
             pathType: Prefix
             backend:
               service:
                 name: wppconnect
-                port:
-                  number: 80
-
-          - path: "/php"
-            pathType: Prefix
-            backend:
-              service:
-                name: myapp
                 port:
                   number: 80
 
