@@ -2,10 +2,6 @@
 
 namespace WPPConnect;
 
-phpinfo();
-
-die;
-
 require '../../vendor/autoload.php';
 
 use WPPConnect\Http\Response;
