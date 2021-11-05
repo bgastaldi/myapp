@@ -34,7 +34,7 @@ if($_GET):
         # Function: Start Session
         # /api/:session/start-session
         $response = $wppconnect->startSession([
-            'webhook' => 'https://app.eot.ai/php/webhook.php',
+            'webhook' => 'https://app.eot.ai/php/webhook/index.php',
             'waitQrCode' => true
         ]);
         $response = $util->toArray($response);

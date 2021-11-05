@@ -6,13 +6,13 @@ phpinfo();
 
 die;
 
-require '../vendor/autoload.php';
+require '../../vendor/autoload.php';
 
 use WPPConnect\Http\Response;
 use WPPConnect\Helpers\Util;
 use WPPConnect\Db\Adapter;
 
-$config = require_once('config/config.php');
+$config = require_once('../config/config.php');
 
 $util = new Util() ;
 $webhook = new Response($config);
