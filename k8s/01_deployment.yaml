@@ -1,0 +1,275 @@
+#WPPConnect Server-Cli: StatefulSet para Deploy
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: server-cli
+spec:
+  serviceName: wppconnect
+  replicas: 2
+  selector:
+    matchLabels:
+      app: server-cli
+  template:
+    metadata:
+      labels:
+        app: server-cli
+    spec:
+      containers:
+        - name: server-cli
+          image: wppconnect/server-cli:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            ["wppserver --secretKey My53cr3tKY --port 21465 --startAllSession"]
+          volumeMounts:
+            - mountPath: /home/tokens
+              name: server-cli-volume
+          ports:
+            - containerPort: 21465
+          imagePullPolicy: Always
+
+          resources:
+            requests:
+              cpu: "0.5"
+              memory: "500Mi"
+            limits:
+              cpu: "0.5"
+              memory: "1Gi"
+
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 21465 #porta do container
+            periodSeconds: 3
+            failureThreshold: 60
+
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 21465 #porta do container
+            periodSeconds: 3
+            failureThreshold: 1
+
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 21465 #porta do container
+            periodSeconds: 5
+            failureThreshold: 1
+            timeoutSeconds: 1
+            successThreshold: 1
+
+  volumeClaimTemplates:
+    - metadata:
+        name: server-cli-volume
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+---
+#WPPConnect Server-Cli: Criação do Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: wppconnect
+spec:
+  selector:
+    app: server-cli
+  type: ClusterIP
+  ports:
+    - name: wppconnect
+      port: 80
+      targetPort: 21465
+---
+#MyApp PHP: Criação do Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+        - name: myapp
+          image: bgastaldi/myapp:latest
+          ports:
+            - containerPort: 80
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "0.05"
+              memory: "200Mi"
+            limits:
+              cpu: "0.05"
+              memory: "250Mi"
+---
+#MyApp PHP: Criação do Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp
+spec:
+  selector:
+    app: myapp
+  type: ClusterIP
+  ports:
+    - name: myapp
+      port: 80
+      targetPort: 80
+---
+#MySQL: Criação do Statefulset
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  replicas: 1
+  serviceName: mysql
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:5.7
+          args:
+            [
+              "--innodb-flush-method=O_DSYNC",
+              "--innodb-use-native-aio=0",
+              "--explicit_defaults_for_timestamp=1",
+              "--ignore-db-dir=lost+found",
+            ]
+          env:
+            # Use secret in real usage
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+            - name: MYSQL_DATABASE
+              value: wpp_db
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-volume
+            - mountPath: /docker-entrypoint-initdb.d/
+              name: mysql-initdb
+          resources:
+            requests:
+              cpu: "0.05"
+              memory: "200Mi"
+            limits:
+              cpu: "0.05"
+              memory: "250Mi"
+      volumes:
+        - name: mysql-initdb
+          configMap:
+            name: mysql-initdb-config
+
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-volume
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+---
+#MySQL: ConfigMap - Base inicial
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+data:
+  initdb.sql: |
+    USE wpp_db;
+    CREATE TABLE `wpp_db`.`chat` (
+      `id` INT NOT NULL AUTO_INCREMENT,
+      `session` VARCHAR(255) NOT NULL,
+      `from_number` VARCHAR(45) NULL,
+      `to_number` VARCHAR(45) NULL,
+      `content` LONGTEXT NULL,
+      `type` VARCHAR(45) NOT NULL,
+      `file_name` VARCHAR(255) NULL,
+      `create_at` DATETIME NOT NULL,
+      PRIMARY KEY (`id`))
+    ENGINE = InnoDB
+    DEFAULT CHARACTER SET = utf8mb4
+    COLLATE = utf8mb4_unicode_ci;
+---
+#MySQL: Criação do Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+  clusterIP: None
+---
+#PHPMyAdmin: Criação do Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pma
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pma
+  template:
+    metadata:
+      labels:
+        app: pma
+    spec:
+      containers:
+        - name: pma
+          image: phpmyadmin:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: PMA_HOST
+              value: mysql-0.mysql
+            - name: PMA_PORT
+              value: "3306"
+            - name: PMA_DB
+              value: wpp_db
+            #- name: PMA_USER
+            #  value: root
+            #- name: PMA_PASSWORD
+            #  value: root
+            - name: PMA_ARBITRARY
+              value: "1"
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "250Mi"
+            limits:
+              cpu: "500m"
+              memory: "250Mi"
+---
+#PHPMyAdmin: Criação do Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: pma
+spec:
+  type: ClusterIP
+  selector:
+    app: pma
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

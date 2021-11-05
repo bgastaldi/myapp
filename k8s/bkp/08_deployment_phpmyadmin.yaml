@@ -1,3 +1,4 @@
+#PHPMyAdmin: Criação do Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -39,7 +40,7 @@ spec:
               cpu: "500m"
               memory: "250Mi"
 ---
-#MySQL: Criação do Banco
+#PHPMyAdmin: Criação do Service
 apiVersion: v1
 kind: Service
 metadata:

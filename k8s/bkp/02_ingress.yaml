@@ -4,8 +4,6 @@ metadata:
   name: ingress-host
   annotations:
     kubernetes.io/ingress.class: "nginx"
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/upstream-hash-by: $remote_addr
     #nginx.ingress.kubernetes.io/affinity: "cookie"
     #nginx.ingress.kubernetes.io/session-cookie-name: "route"
@@ -13,26 +11,14 @@ metadata:
     #nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
 
 spec:
-  tls:
-    - hosts:
-        - app.eot.ai
-      secretName: ingress-host-tls
   rules:
     - host: "app.eot.ai"
       http:
         paths:
-          - path: "/api"
-            pathType: Prefix
+          - pathType: Prefix
+            path: "/api"
             backend:
               service:
                 name: wppconnect
-                port:
-                  number: 80
-
-          - path: "/php"
-            pathType: Prefix
-            backend:
-              service:
-                name: myapp
                 port:
                   number: 80
